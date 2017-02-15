@@ -65,11 +65,11 @@ $('.booking').click(function(){
 //    $('#admin').fadeIn(1000);
 //    sidenumber=6;
 //    });
-//
-//   $('.bookingStuff').click(function(){
-//    pageChange();
-//    sidenumber=7;
-//    });
+
+$('.bookingStuff').click(function(){
+ pageChange();
+ sidenumber=7;
+ });
 
 /*******fadeOut function for Pages ******/
 function pageChange(){
@@ -155,7 +155,6 @@ function pageChange(){
   };
 };
 
-
   $(".weekbtn").click(function(){
     weekbtnid=$(this).attr("id");
     if (weekbtnid==="prevWeekBtn") {
@@ -183,9 +182,9 @@ function pageChange(){
 function availableTime() {
   // $.ajax({
   //     type:'GET',
-  //     url:"http://localhost/hyresvarlden/tvattapi.php",
+  //     url:"http://tvattapi.php",
   //     dataType:'json',
-  //     data:"json",
+  //     data:"idnr:id",
   //     success:function(feed) {
   //
   //     },
@@ -198,23 +197,14 @@ function availableTime() {
   //foreach loop som kontrollerar ifall tiden är bokad eller inte.
 
   //var times = json.pars();
-  var times = {
-    11:true,
-    12:true,
-    13:false,
-    14:true
-};
 
-    for (var X in times) {
-
-    if (x==true) {
-
-      $("#"+x).removeClass("btn-danger").addClass("btn-success");
-    }
-    else {
-      $("#"+x).removeClass("btn-success").addClass("btn-danger");
-    }
-  }
+    // if (true) {
+    //
+    //   $("#").removeClass("btn-danger").addClass("btn-success");
+    // }
+    // else {
+    //   $("#").removeClass("btn-success").addClass("btn-danger");
+    // }
 }
 
 
@@ -224,19 +214,19 @@ $("#comfirm").click(function(){
     $.ajax({
         type: "POST",
         //the url where you want to sent the userName and password to
-        url: "http://localhost/hyresvarlden/tvattapi.php", //en annan URL ska det vara
+        url: "http://bokatvattidapi.php", //en annan URL ska det vara
         dataType: 'json',
         //json object to sent to the authentication url
-        data: {"weeknr": week , "idnr": id , "user": epost},
+        data: {"idnr": id },
         success: function (data) {
-          console.log(""+data.week);
-          console.log(""+data.id);
+          console.log(data.id);
           console.log(data);
-          if (data.week === true && data.id===true) {
+          if (data.idnr===true) {
+            console.log();
                 $("#"+id).removeClass("btn-success").addClass("btn-danger");//ändra till knappen med det id till btn-danger class i stället för btn success;
           }
           else {
-            console.log("något stämmer inte");
+            alert("This time is taken");
           }
 
         },
@@ -247,6 +237,35 @@ $("#comfirm").click(function(){
     });
 });
 
+$("#delete").click(function(){
+  console.log(week +" "+ id);
+    $.ajax({
+        type: "POST",
+        //the url where you want to sent the userName and password to
+        url: "http://deletetvattidapi.php", //en annan URL ska det vara
+        dataType: 'json',
+        //json object to sent to the authentication url
+        data: {"idnr": id },
+        success: function (data) {
+          console.log(data.id);
+          console.log(data);
+          if (data.idnr===true) {
+            console.log("Time removed");
+                $("#"+id).removeClass("btn-danger").addClass("btn-success");//ändra till knappen med det id till btn-danger class i stället för btn success;
+          }
+          else {
+            alert("This time is taken");
+          }
+
+        },
+        error: function(OB, text, ET){
+          console.log(text);
+          console.log(ET);
+        }
+    });
+});
+
+
 /*******Img animation(Blink)***********/
      for (var i = 0; i < 5; i++) {
           $(".img-thumbnail").fadeOut(500);
@@ -255,7 +274,6 @@ $("#comfirm").click(function(){
 
 /***************Login*****************/
 $body = $("body");
-
 function loadingScreen(){
   $(document).on({
     ajaxStart: function() { $body.addClass("loading");},
@@ -268,34 +286,31 @@ function loadingScreen(){
          e.preventDefault();
          loadingScreen();
            //collect userName and password entered by users
-           var user = $("#username").val();
-           var pwd = $("#password").val();
+           var user = $(".username").val();
+           var pwd = $(".password").val();
            //call the authenticate function
            authenticate(user, pwd);
        });
 
    //authenticate function to make ajax call
    function authenticate(user, pwd) {
-     console.log(user);
-     console.log(pwd);
 
        $.ajax({
            type: "POST",
            //the url where you want to sent the userName and password to
-           url: "http://localhost/hyresvarlden/api.php", //ändra url
-           //dataType: 'json',
+           url: "http://api.php", //ändra url
+           dataType: 'json',
            //json object to sent to the authentication url
-           data: {user : "user" , pwd : "pwd"},
+           data: {user : user , pwd : pwd},
            success: function (data) {
-             //if ((data.user === true)&&(data.pwd === true)) {
+             if ((data.user === true)&&(data.pwd === true)) {
                $("#login").fadeOut(500);
                $("#minsida").fadeIn(1000);
                sidenumber=3;
-               console.log(data);
-            // }
-            //  else {
-            //    alert("Fel Användarnamn eller Lösenord")
-            //  }
+             }
+             else {
+               alert("Fel Användarnamn eller Lösenord")
+             }
                         },
            error: function(OB, text, ET){
              console.log(text);
@@ -307,7 +322,7 @@ function loadingScreen(){
      /***********Logout**********************/
      $(".logout").click(function() {
             $.ajax({
-                url: './logout.php?argument=logOut',
+                url: 'http://logout.php',
                 success: function(data){
                     window.location.href = data;
                 }
